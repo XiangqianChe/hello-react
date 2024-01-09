@@ -1,11 +1,14 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React from 'react';
-import { CardChecklist } from 'react-bootstrap-icons';
+import { useState } from "react";
+import ReactDOM from 'react-dom';
+import { CardChecklist, Trash } from 'react-bootstrap-icons';
 import Container from "react-bootstrap/Container";
 import FormControl from "react-bootstrap/FormControl";
 import InputGroup from "react-bootstrap/InputGroup";
 import Navbar from "react-bootstrap/Navbar";
-import ReactDOM from 'react-dom';
+import Button from "react-bootstrap/Button";
+
 
 function fetchTodos() {
   return [
@@ -40,19 +43,25 @@ function fetchTodos() {
 function TodoItem(props) {
   return (
     <InputGroup key={props.id}>
-      <InputGroup.Checkbox checked={props.completed} />
+      <InputGroup.Checkbox
+        checked={props.completed}
+        onChange={props.onToggle}
+      />
       <FormControl
         value={props.title}
         style={{
           textDecoration: props.completed ? "line-through 4px" : "none",
         }}
       />
+      <Button variant="outline-danger" onClick={props.onDelete}>
+        <Trash />
+      </Button>
     </InputGroup>
   )
 }
 
 function App() {
-  const todos = fetchTodos();
+  const [todos, setTodos] = useState(fetchTodos());
   return (
     <>
       <Navbar bg="dark" variant="dark">
@@ -69,6 +78,16 @@ function App() {
             key={todo.id}
             title={todo.title}
             completed={todo.completed}
+            onDelete={() => {
+              setTodos(todos.filter((x) => x.id !== todo.id));
+            }}
+            onToggle={() => {
+              setTodos(
+                todos.map((x) =>
+                  x.id === todo.id ? { ...x, completed: !x.completed } : x
+                )
+              );
+            }}
           />
         ))}
       </Container>
